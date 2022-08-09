@@ -6,7 +6,7 @@
 /*   By: mikael <mikael@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 09:14:59 by mikael            #+#    #+#             */
-/*   Updated: 2022/08/09 16:04:28 by mjonatha         ###   ########.fr       */
+/*   Updated: 2022/08/09 17:30:01 by mjonatha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ char*	keeping_memory(char* middle_string)
 		{
 			i++;
 			j = 0;
-			while(middle_string[i])
+			while(middle_string[i] != '\0')
 				{
 					string[j] = middle_string[i];
 					i++;
