@@ -6,7 +6,7 @@
 /*   By: mikael <mikael@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 09:14:59 by mikael            #+#    #+#             */
-/*   Updated: 2022/08/09 17:30:01 by mjonatha         ###   ########.fr       */
+/*   Updated: 2022/08/12 11:30:34 by mjonatha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ char*	join(char* s1, char* s2)
 		i++;
 		j++;
 	}
-	s3[i] = 0;
+	s3[i] = '\0';
 	return (s3);
 	}
 	
@@ -67,19 +67,21 @@ char *remember_join_buffer(char* remembrall, int fd)
 	if (remembrall)
 		string = ft_strlcpy2(string, remembrall);
 	else if (!remembrall)	
-		string = ft_strlcpy2(string, buffer);	
-	while(red > 0 && check_backslash_n(string) == 0)
+		string = ft_strlcpy2(string, buffer);
+//	printf("[[[[%s]]]]", string);	
+	while(red > 0 && check_backslash_n(string) == 0 && string)
 	{
 		temp = string;
 		red = read(fd, buffer, BUFFER_SIZE);
+	//	printf("{{{{%d}}}}", red);
 		string = join(string, buffer);
 		free (temp);
 	} 
 	free (buffer);
 	string_return = malloc(sizeof(char)*ft_strlen(string) + 1);
 	if(!string_return)
-		return (0);	
-string_return = ft_strlcpy2(string_return, string);
+		return (0);
+	string_return = ft_strlcpy2(string_return, string);
 	free (string);
  	return (string_return);
 }
@@ -91,27 +93,30 @@ char*	keeping_memory(char* middle_string)
 	int 	j;
 		
 	i = 0;
-	j = ft_count_buffer(middle_string) - ft_strlen(middle_string);
-	if(j < 0)
-		j = i * -1;
-	string = malloc(sizeof(char)*j + 2);
+	if (ft_strlen(middle_string) == 1)
+		j = 1;
+	else
+		j = ft_count_buffer(middle_string) - ft_strlen(middle_string);
+	if (j < 0)
+		j = j * -1;
+	string = malloc(sizeof(char) * j + 1);
 	if(!string)
 		return (0);
-	while(middle_string[i])
+		while(middle_string[i])
 	{
 		if(middle_string[i] == '\n')
 		{
 			i++;
 			j = 0;
 			while(middle_string[i] != '\0')
-				{
-					string[j] = middle_string[i];
-					i++;
-					j++;
-				}
-		i--;
+			{
+				string[j] = middle_string[i];
+				i++;
+				j++;
+			}
+			i--;
 		}
-	i++;
+		i++;
 	}
 	string[j] = '\0';
 	return (string);
@@ -120,30 +125,32 @@ char*	keeping_memory(char* middle_string)
 char*	clean_it(char* string)
 {
 	int i;
-	int j;
 	char*	str_return;
 		
-	j = 0;
 	i = ft_count_buffer(string);
 	str_return = malloc(sizeof(char)*i + 1);
 	if (!str_return)
 		return (0);
 	i = 0;
+		if (string[0] == '\n')
+		{
+			str_return[0] = '\n';
+			str_return[1] = '\0';
+			return (str_return);
+		}	
    	while (string[i] != '\n' && string[i] != '\0')
 	{
-		str_return[j] = string[i];
+		str_return[i] = string[i];
 		i++;
-		j++;
 		if(string[i] == '\n')
 		{
-			str_return[j] = string[i];
-		   j++;
-	    }	   
+			str_return[i] = '\n';
+			str_return[++i] = '\0';
+			 return (str_return);	
+		}
 	}
-	str_return[j] = '\0';
-	return(str_return);
+	return (0);
 }
-
 
 char *get_next_line(int fd)
 {
@@ -151,21 +158,18 @@ char *get_next_line(int fd)
 	char*			middle_string;
 	char*			final_string;
 	
+	printf("%d", fd);
+//	printf("\\\\\\\%s///", remembrall);
 	middle_string = remember_join_buffer(remembrall, fd);
-//	printf("middle : %s\n", middle_string);
 	remembrall = keeping_memory(middle_string);
-//	printf("rem : %s\n", remembrall);
-	//there is a leak in keeping_memory maybe i can use the fact that remembrall is a static. In that way i just call the function 
-	//keeping_memory and put what i need in the static.
 	final_string = clean_it(middle_string);
 	free (middle_string);
-	//printf("final : %s", final_string);
+
 	return (final_string);
 }
 
 int main()
 {
-	int i = 7;
 	char*	str;
 
 	int fd;
@@ -174,14 +178,18 @@ int main()
 	{
 		return (1);
 	}
-	while(i > 0)
+	str = get_next_line(fd);
+	printf("%s", str);
+	while(str)
 	{
+		if (str)
+			free(str);
 		str = get_next_line(fd);
 		printf("%s", str);
-		free (str);
-		i--;
 	}
-
-	system("leaks a.out");
+	if (str)
+		free(str);
+   	close(fd); 
+//	system("leaks a.out");
 	return (0);
 }
