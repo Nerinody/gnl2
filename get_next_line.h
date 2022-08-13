@@ -6,7 +6,7 @@
 /*   By: mikael <mikael@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/06 15:03:21 by mikael            #+#    #+#             */
-/*   Updated: 2022/08/08 14:58:58 by mikael           ###   ########.fr       */
+/*   Updated: 2022/08/13 14:17:14 by mjonatha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,5 +20,6 @@ char*  ft_strlcpy2(char *dst, const char *src);
 int ft_strlen(const char *str);
 int check_backslash_n(char *buf);
 int	ft_count_buffer(char * middle_string);
+char*	get_next_line(int fd);
 
 #endif

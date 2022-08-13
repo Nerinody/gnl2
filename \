@@ -6,7 +6,7 @@
 /*   By: mikael <mikael@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 09:14:59 by mikael            #+#    #+#             */
-/*   Updated: 2022/08/13 14:14:34 by mjonatha         ###   ########.fr       */
+/*   Updated: 2022/08/09 13:35:37 by mjonatha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,12 @@ char*	join(char* s1, char* s2)
 	unsigned int	i;
 	unsigned int	j;
 
-	if (!s1 && !s2)
-		return (NULL);
 	s3 = (char *)malloc(sizeof(*s3) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (!s3)
 		return (0);
 	i = 0;
 	j = 0;
-	 while (s1[i] != 0 && s1[i])
+	while (s1[i] != 0 && s1[i])
 	{
 		s3[i] = s1[i];
 		i++;
@@ -46,7 +44,7 @@ char*	join(char* s1, char* s2)
 		i++;
 		j++;
 	}
-	s3[i] = '\0';
+	s3[i] = 0;
 	return (s3);
 	}
 	
@@ -55,13 +53,13 @@ char*	join(char* s1, char* s2)
 char *remember_join_buffer(char* remembrall, int fd)
 {
 	char*	string;
+	char*	string_return;
 	char*	buffer;
 	char*	temp;
 	int		red;
 
 	string = NULL;
 	buffer = malloc(sizeof(char)*BUFFER_SIZE + 1);
-
 	if (!buffer)
 		return (0);
 	red = BUFFER_SIZE;
@@ -69,110 +67,105 @@ char *remember_join_buffer(char* remembrall, int fd)
 	if (remembrall)
 		string = ft_strlcpy2(string, remembrall);
 	else if (!remembrall)	
-		string = ft_strlcpy2(string, buffer);
-	while(red > 0 && check_backslash_n(string) == 0 && string)
+		string = ft_strlcpy2(string, buffer);	
+	while(red > 0 && check_backslash_n(string) == 0)
 	{
 		temp = string;
 		red = read(fd, buffer, BUFFER_SIZE);
-		if (red == 0)
-		{
-			free (string);
-			free (buffer);
-			return (NULL);
-		}
 		string = join(string, buffer);
 		free (temp);
 	} 
 	free (buffer);
- 	return (string);
+	string_return = malloc(sizeof(char)*ft_strlen(string) + 1);
+	if(!string_return)
+		return (0);	
+	string_return = ft_strlcpy2(string_return, string);
+	free (string);
+ 	return (string_return);
+	//my problem is that what s in the remembrall doesn t seems copied in the new string... which is the purpose of this function so well my dear lets work it out.
 }
 
 char*	keeping_memory(char* middle_string)
 {
 	char*	string;
+	char*	string2;
 	int		i;
 	int 	j;
-		
+	
 	i = 0;
-	if (ft_strlen(middle_string) == 1)
-		j = 1;
-	else
-		j = ft_count_buffer(middle_string) - ft_strlen(middle_string);
-	if (j < 0)
-		j = j * -1;
-	string = malloc(sizeof(char) * j + 1);
+	j = ft_count_buffer(middle_string) - ft_strlen(middle_string);
+	if(i < 0)
+		j = i * -1;
+	string = malloc(sizeof(char)*j + 1);
 	if(!string)
-		return (0);
-		while(middle_string[i])
+		return(0);
+	while(middle_string[i])
 	{
 		if(middle_string[i] == '\n')
 		{
 			i++;
 			j = 0;
-			while(middle_string[i] != '\0' && middle_string)
-			{
-				string[j] = middle_string[i];
-				i++;
-				j++;
-			}
-			i--;
+			while(middle_string[i])
+				{
+					string[j] = middle_string[i];
+					i++;
+					j++;
+				}
+		i--;
 		}
-		i++;
+	i++;
 	}
 	string[j] = '\0';
-	return (string);
+	string2 = string;
+	free (string);
+	return (string2);
 }
 
 char*	clean_it(char* string)
 {
 	int i;
+	int j;
 	char*	str_return;
 		
+	j = 0;
 	i = ft_count_buffer(string);
 	str_return = malloc(sizeof(char)*i + 1);
 	if (!str_return)
 		return (0);
 	i = 0;
-	if (string[0] == '\n')
-		{
-			str_return[0] = '\n';
-			str_return[1] = '\0';
-			return (str_return);
-		}	
    	while (string[i] != '\n' && string[i] != '\0')
 	{
-		str_return[i] = string[i];
+		str_return[j] = string[i];
 		i++;
+		j++;
 		if(string[i] == '\n')
 		{
-			str_return[i] = '\n';
-			str_return[++i] = '\0';	
-			return (str_return);	
-		}
+			str_return[j] = string[i];
+		   j++;
+	    }	   
 	}
-	return (0);
+	str_return[0] = 'a';
+	str_return[1] = '\0';
+	return(str_return);
 }
+
 
 char *get_next_line(int fd)
 {
 	static char*	remembrall;
 	char*			middle_string;
 	char*			final_string;
-
+	
 	middle_string = remember_join_buffer(remembrall, fd);
-	if (!middle_string)
-		{
-		free(remembrall);
-		return(NULL);
-		}
-	if (remembrall)
-		free (remembrall);
+	printf("remembrall; %s\n", remembrall);
 	remembrall = keeping_memory(middle_string);
+	printf("remembrall; %s\n", remembrall);
 	final_string = clean_it(middle_string);
-	free(middle_string);
+	free (middle_string);
+	//printf("final : %s", final_string);
 	return (final_string);
 }
-/*
+
 int main()
 {
 	char*	str;
@@ -183,18 +176,13 @@ int main()
 	{
 		return (1);
 	}
+
 	str = get_next_line(fd);
-	printf("%s", str);
-	while(str)
-	{   
-		if (str)
-			free(str);
-		str = get_next_line(fd);
-		printf("%s", str);
-	}
-	if (str)
-		free(str);
-   	close(fd); 
+	printf("print 1 : %s", str);
+	free (str);
+	str = get_next_line(fd);
+	printf("print 2 : %s", str);
+	free (str);
 	system("leaks a.out");
 	return (0);
-}*/
+}

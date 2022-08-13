@@ -6,7 +6,7 @@
 /*   By: mikael <mikael@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/06 14:57:43 by mikael            #+#    #+#             */
-/*   Updated: 2022/08/08 16:22:40 by mikael           ###   ########.fr       */
+/*   Updated: 2022/08/13 14:14:31 by mjonatha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,13 @@ int ft_strlen(const char *str)
 char*	ft_strlcpy2(char *dst,const char *src)
 {
 	int	i;
+	int	len;
 
+	len = ft_strlen(src);
 	i = 0;
-	dst = malloc(sizeof(char)*ft_strlen(src) + 1);
+	dst = malloc(sizeof(char)*len + 1);
+	if (!dst)
+		return (NULL);
 	while (src[i])
 	{
 		dst[i] = src[i];
