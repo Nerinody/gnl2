@@ -6,7 +6,7 @@
 /*   By: mikael <mikael@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 09:14:59 by mikael            #+#    #+#             */
-/*   Updated: 2022/08/13 14:14:34 by mjonatha         ###   ########.fr       */
+/*   Updated: 2022/08/14 18:02:45 by mikael           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ char*	keeping_memory(char* middle_string)
 	string = malloc(sizeof(char) * j + 1);
 	if(!string)
 		return (0);
-		while(middle_string[i])
+	while(middle_string[i])
 	{
 		if(middle_string[i] == '\n')
 		{
@@ -153,12 +153,14 @@ char*	clean_it(char* string)
 	return (0);
 }
 
-char *get_next_line(int fd)
+char*	get_next_line(int fd)
 {
 	static char*	remembrall;
 	char*			middle_string;
 	char*			final_string;
 
+	if (fd < 0 || BUFFER_SIZE < 1 || read(fd, 0, 0) < 0)
+		return (NULL);
 	middle_string = remember_join_buffer(remembrall, fd);
 	if (!middle_string)
 		{
